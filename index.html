@@ -13,10 +13,153 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main id="home-root"></main>
+    <main id="home-root">
+      <section class="hero" id="hero-banner">
+        <div class="hero__dots" id="hero-dots"></div>
+      </section>
+
+      <section data-reveal class="featured container" id="featured-section">
+        <div class="featured__head">
+          <h2 class="featured__title" id="featured-title"></h2>
+          <p class="featured__sub" id="featured-sub"></p>
+        </div>
+        <div class="featured__viewport">
+          <div id="featured-track" class="featured__track"></div>
+        </div>
+      </section>
+
+      <section data-reveal class="banners container">
+        <div class="banners__grid" id="banners-grid"></div>
+      </section>
+
+      <section data-reveal class="discovery container">
+        <div class="discovery__head">
+          <h2 class="discovery__title" id="discovery-title"></h2>
+          <p class="discovery__desc" id="discovery-desc"></p>
+        </div>
+        <div class="discovery__grid" id="discovery-grid"></div>
+      </section>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- Home templates, cloned + filled by home.js -->
+  <template id="tpl-hero-slide">
+    <div class="hero-slide">
+      <div class="hero-bg"></div>
+      <div class="hero__content">
+        <div class="container">
+          <div class="hero-text">
+            <span class="hero-text__sub"></span>
+            <h1 class="hero-text__title"></h1>
+            <p class="hero-text__desc"></p>
+            <a class="hero-text__btn"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-hero-dot">
+    <button class="hero-dot"></button>
+  </template>
+
+  <template id="tpl-featured-item">
+    <div class="featured__item"></div>
+  </template>
+
+  <template id="tpl-banner">
+    <div class="banner">
+      <img class="banner__img" alt="" />
+      <div class="banner__tint"></div>
+      <div class="banner__content">
+        <span class="banner__sub"></span>
+        <h2 class="banner__title"></h2>
+        <p class="banner__desc"></p>
+        <a class="banner__btn"></a>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-discovery-item">
+    <div class="discovery__item">
+      <a class="discovery__media">
+        <div class="discovery__media-inner"><img alt="" /></div>
+      </a>
+      <div class="discovery__body">
+        <h3 class="discovery__name"></h3>
+        <a class="discovery__link">
+          <span class="discovery__link-text"></span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </template>
+
+  <!-- Shared product card -->
+  <template id="tpl-product-card">
+    <div class="product-card" data-product-card>
+      <a class="product-card__link">
+        <div class="product-card__media">
+          <div class="product-card__badge"><span></span></div>
+          <div class="product-card__imgwrap">
+            <img class="product-card__img product-card__img--main" alt="" />
+            <img class="product-card__img product-card__img--alt" alt="" />
+          </div>
+          <div class="product-card__quick">
+            <button type="button" class="product-card__quick-btn quickview-btn" title="Quick View">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="product-card__quick--mobile">
+            <button type="button" class="product-card__quick-btn quickview-btn" title="Quick View">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__prices">
+            <span class="product-card__old"><span class="taka">৳</span> <span class="product-card__old-val"></span></span>
+            <span class="product-card__price"><span class="taka">৳</span> <span class="product-card__price-val"></span></span>
+          </div>
+          <h3 class="product-card__name"></h3>
+        </div>
+      </a>
+    </div>
+  </template>
+
+  <!-- Shared quick-view modal -->
+  <template id="tpl-quickview">
+    <div class="qv">
+      <div class="qv__backdrop" data-qv-close></div>
+      <div class="qv__panel">
+        <button data-qv-close class="qv__close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="qv__media">
+          <div class="qv__badge"><span></span></div>
+          <img alt="" />
+        </div>
+        <div class="qv__body">
+          <div>
+            <span class="qv__cat"></span>
+            <h2 class="qv__name"></h2>
+            <div class="qv__prices">
+              <span class="qv__old"><span class="taka">৳ </span><span class="qv__old-val"></span></span>
+              <span class="qv__price"><span class="taka">৳ </span><span class="qv__price-val"></span></span>
+            </div>
+            <div class="qv__rule"></div>
+            <p class="qv__desc"></p>
+          </div>
+          <div class="qv__actions">
+            <a class="qv__btn qv__btn--primary">View Details</a>
+            <a target="_blank" rel="noopener noreferrer" class="qv__btn qv__btn--ghost">Purchase Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
 
   <script>window.PAGE_ROUTE = "/";</script>
   <script src="js/data.js"></script>

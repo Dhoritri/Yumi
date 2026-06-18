@@ -13,10 +13,96 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main class="page-white" id="blog-detail-root"></main>
+    <main class="page-white" id="blog-detail-root">
+      <div id="bd-notfound" class="notfound-screen" hidden><h1>Post not found</h1></div>
+
+      <div id="bd-content" hidden>
+        <div class="crumbbar">
+          <div class="container crumb crumb--truncate">
+            <a href="index.html">Home</a>
+            <span class="crumb__sep">—</span>
+            <a href="blog.html">Blogs</a>
+            <span class="crumb__sep">—</span>
+            <span class="crumb__current" data-text="title"></span>
+          </div>
+        </div>
+
+        <article class="container article">
+          <div class="article__head">
+            <div class="article__cat" data-text="category"></div>
+            <h1 class="article__title" data-text="title"></h1>
+            <div class="article__meta">
+              <span>By <b data-text="author"></b></span>
+              <span class="sep">|</span>
+              <span><span data-text="month"></span> <span data-text="day"></span></span>
+            </div>
+          </div>
+
+          <div class="article__hero">
+            <img data-src="image" data-alt="title" />
+          </div>
+
+          <div class="article__content">
+            <div><p data-text="description"></p></div>
+
+            <div class="article__nav" id="bd-nav">
+              <div class="article__spacer"></div>
+            </div>
+          </div>
+        </article>
+
+        <section class="related">
+          <div class="container">
+            <h2 class="related__title">Related Posts</h2>
+            <div class="related__grid" id="bd-related"></div>
+          </div>
+        </section>
+      </div>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- Blog detail templates, cloned + filled by blog-detail.js -->
+  <template id="tpl-bd-prev">
+    <a class="article__nav-link">
+      <div class="article__nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <div>
+        <span class="article__nav-label">Previous</span>
+        <p class="article__nav-title" data-text="title"></p>
+      </div>
+    </a>
+  </template>
+
+  <template id="tpl-bd-next">
+    <a class="article__nav-link article__nav-link--next">
+      <div>
+        <span class="article__nav-label">Next</span>
+        <p class="article__nav-title" data-text="title"></p>
+      </div>
+      <div class="article__nav-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </a>
+  </template>
+
+  <template id="tpl-related-card">
+    <a class="related-card">
+      <article>
+        <div class="related-card__media">
+          <img data-src="image" data-alt="title" />
+        </div>
+        <div class="related-card__meta">
+          <span data-text="category"></span>
+          <span>|</span>
+          <span><span data-text="month"></span> <span data-text="day"></span></span>
+        </div>
+        <h3 class="related-card__title" data-text="title"></h3>
+      </article>
+    </a>
+  </template>
 
   <script>window.PAGE_ROUTE = "/blog";</script>
   <script src="js/data.js"></script>

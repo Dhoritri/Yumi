@@ -13,10 +13,37 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main class="page-white" id="policy-root"></main>
+    <main class="page-white" id="policy-root">
+      <div class="crumbbar">
+        <div class="container crumb">
+          <a href="index.html">Home</a>
+          <span class="crumb__sep">—</span>
+          <span class="crumb__current" data-text="title"></span>
+        </div>
+      </div>
+
+      <section data-reveal class="policy container">
+        <div class="policy__head">
+          <h1 class="policy__title" data-text="title"></h1>
+          <p class="policy__updated">Last Updated: <span data-text="lastUpdated"></span></p>
+        </div>
+        <div class="policy__sections" id="policy-sections"></div>
+        <div class="policy__note" id="policy-note" hidden>
+          If you have any questions about our Privacy Policy, please contact us at hello@grace.com.
+        </div>
+      </section>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- Repeated policy section markup, cloned + filled by policy.js -->
+  <template id="tpl-policy-section">
+    <div class="policy__section">
+      <h2 data-text="title"></h2>
+      <p data-text="content"></p>
+    </div>
+  </template>
 
   <script>window.PAGE_ROUTE = "/terms-conditions"; window.POLICY_TYPE = "terms";</script>
   <script src="js/data.js"></script>

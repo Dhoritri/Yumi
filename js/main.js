@@ -50,6 +50,65 @@ function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
+/* ─── Declarative data binding ───────────────────────────────────────────────
+   Markup lives in the .html files (often inside <template> elements). These
+   helpers let the JS inject dynamic values into that markup without writing
+   HTML strings here.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Resolve a dotted path (supports "arr[0].field") against an object. */
+function getPath(obj, path) {
+  if (!path) return undefined;
+  return path.split(".").reduce((o, key) => {
+    if (o == null) return undefined;
+    const m = key.match(/^(.*)\[(\d+)\]$/);
+    if (m) {
+      const arr = m[1] ? o[m[1]] : o;
+      return arr ? arr[Number(m[2])] : undefined;
+    }
+    return o[key];
+  }, obj);
+}
+
+/* Fill data-* binding hooks found inside `scope` from the `data` object:
+     data-text        -> textContent
+     data-html        -> innerHTML
+     data-src         -> src attribute
+     data-alt         -> alt attribute
+     data-href        -> href attribute (run through routeTo)
+     data-placeholder -> placeholder attribute                                   */
+function applyBindings(scope, data) {
+  scope.querySelectorAll("[data-text]").forEach((el) => {
+    const v = getPath(data, el.getAttribute("data-text"));
+    el.textContent = v == null ? "" : v;
+  });
+  scope.querySelectorAll("[data-html]").forEach((el) => {
+    const v = getPath(data, el.getAttribute("data-html"));
+    el.innerHTML = v == null ? "" : v;
+  });
+  scope.querySelectorAll("[data-src]").forEach((el) => {
+    const v = getPath(data, el.getAttribute("data-src"));
+    if (v != null) el.setAttribute("src", v);
+  });
+  scope.querySelectorAll("[data-alt]").forEach((el) => {
+    const v = getPath(data, el.getAttribute("data-alt"));
+    if (v != null) el.setAttribute("alt", v);
+  });
+  scope.querySelectorAll("[data-href]").forEach((el) => {
+    el.setAttribute("href", routeTo(getPath(data, el.getAttribute("data-href"))));
+  });
+  scope.querySelectorAll("[data-placeholder]").forEach((el) => {
+    const v = getPath(data, el.getAttribute("data-placeholder"));
+    if (v != null) el.setAttribute("placeholder", v);
+  });
+}
+
+/* Clone a <template> by id and return its first element child. */
+function cloneTpl(id) {
+  const tpl = document.getElementById(id);
+  return tpl.content.firstElementChild.cloneNode(true);
+}
+
 /* Inline lucide-style icons (24x24, stroke currentColor). */
 function lucide(name, size) {
   const s = size || 24;
@@ -353,92 +412,87 @@ function renderScrollToTop() {
   btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 }
 
-/* ─── ProductCard (shared) ───────────────────────────────────────────────── */
-function productCardHtml(product) {
-  const badgeClass = product.badge === "New" ? "product-card__badge--new" : "product-card__badge--sale";
-  const badge = product.badge
-    ? `<div class="product-card__badge ${badgeClass}"><span>${escapeHtml(product.badge)}</span></div>`
-    : "";
+/* ─── ProductCard (shared) ───────────────────────────────────────────────────
+   Markup lives in <template id="tpl-product-card"> inside the pages that show
+   product cards. This clones that template and fills in the product data.
+   Returns a DOM node (the .product-card element).
+   ───────────────────────────────────────────────────────────────────────── */
+function renderProductCard(product) {
+  const card = cloneTpl("tpl-product-card");
+  card.setAttribute("data-slug", product.slug);
+  card.querySelector(".product-card__link").setAttribute("href", routeTo("/product/" + product.slug));
 
+  const badge = card.querySelector(".product-card__badge");
+  if (product.badge) {
+    badge.classList.add(product.badge === "New" ? "product-card__badge--new" : "product-card__badge--sale");
+    badge.querySelector("span").textContent = product.badge;
+  } else {
+    badge.remove();
+  }
+
+  const mainImg = card.querySelector(".product-card__img--main");
+  mainImg.src = product.image;
+  mainImg.alt = product.name;
+
+  const altImg = card.querySelector(".product-card__img--alt");
   const hasAlt = product.gallery && product.gallery[1];
-  const mainImgClass = hasAlt ? "product-card__img--has-alt" : "product-card__img--zoom";
-  const altImg = hasAlt
-    ? `<img src="${product.gallery[1]}" alt="${escapeHtml(product.name)} alternate view" class="product-card__img product-card__img--alt" />`
-    : "";
+  if (hasAlt) {
+    mainImg.classList.add("product-card__img--has-alt");
+    altImg.src = product.gallery[1];
+    altImg.alt = product.name + " alternate view";
+  } else {
+    mainImg.classList.add("product-card__img--zoom");
+    altImg.remove();
+  }
 
-  const oldPrice = product.oldPrice
-    ? `<span class="product-card__old"><span class="taka">৳</span> ${product.oldPrice.toFixed(2)}</span>`
-    : "";
+  const prices = card.querySelector(".product-card__prices");
+  const oldEl = prices.querySelector(".product-card__old");
+  const priceEl = prices.querySelector(".product-card__price");
+  if (product.oldPrice) {
+    oldEl.querySelector(".product-card__old-val").textContent = product.oldPrice.toFixed(2);
+    priceEl.classList.add("product-card__price--discount");
+  } else {
+    oldEl.remove();
+  }
+  priceEl.querySelector(".product-card__price-val").textContent = product.price.toFixed(2);
 
-  const eyeSvg = (sw) => `<svg width="${sw}" height="${sw}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
-
-  return `
-    <div class="product-card" data-product-card data-slug="${escapeHtml(product.slug)}">
-      <a href="${routeTo("/product/" + product.slug)}">
-        <div class="product-card__media">
-          ${badge}
-          <div class="product-card__imgwrap">
-            <img src="${product.image}" alt="${escapeHtml(product.name)}" class="product-card__img ${mainImgClass}" />
-            ${altImg}
-          </div>
-          <div class="product-card__quick">
-            <button class="product-card__quick-btn quickview-btn" title="Quick View">${eyeSvg(23)}</button>
-          </div>
-          <div class="product-card__quick--mobile">
-            <button class="product-card__quick-btn quickview-btn" title="Quick View">${eyeSvg(20)}</button>
-          </div>
-        </div>
-        <div class="product-card__info">
-          <div class="product-card__prices">
-            ${oldPrice}
-            <span class="product-card__price ${product.oldPrice ? "product-card__price--discount" : ""}"><span class="taka">৳</span> ${product.price.toFixed(2)}</span>
-          </div>
-          <h3 class="product-card__name">${escapeHtml(product.name)}</h3>
-        </div>
-      </a>
-    </div>
-  `;
+  card.querySelector(".product-card__name").textContent = product.name;
+  return card;
 }
 
+/* QuickView modal — markup lives in <template id="tpl-quickview">. */
 function openQuickView(product) {
-  const badgeClass = product.badge === "New" ? "product-card__badge--new" : "product-card__badge--sale";
-  const badge = product.badge
-    ? `<div class="qv__badge ${badgeClass}"><span>${escapeHtml(product.badge)}</span></div>`
-    : "";
-  const oldPrice = product.oldPrice
-    ? `<span class="qv__old"><span class="taka">৳ </span>${product.oldPrice.toFixed(2)}</span>`
-    : "";
+  const overlay = cloneTpl("tpl-quickview");
 
-  const overlay = document.createElement("div");
-  overlay.className = "qv";
-  overlay.innerHTML = `
-    <div class="qv__backdrop" data-qv-close></div>
-    <div class="qv__panel">
-      <button data-qv-close class="qv__close">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-      <div class="qv__media">
-        ${badge}
-        <img src="${product.image}" alt="${escapeHtml(product.name)}" />
-      </div>
-      <div class="qv__body">
-        <div>
-          <span class="qv__cat">${escapeHtml(product.category)}</span>
-          <h2 class="qv__name">${escapeHtml(product.name)}</h2>
-          <div class="qv__prices">
-            ${oldPrice}
-            <span class="qv__price"><span class="taka">৳ </span>${product.price.toFixed(2)}</span>
-          </div>
-          <div class="qv__rule"></div>
-          <p class="qv__desc">Take a closer look at our ${escapeHtml(product.name.toLowerCase())}. This elegant piece from our ${escapeHtml(product.category.toLowerCase())} collection is designed for those who appreciate refined beauty and exceptional quality.</p>
-        </div>
-        <div class="qv__actions">
-          <a href="${routeTo("/product/" + product.slug)}" class="qv__btn qv__btn--primary">View Details</a>
-          <a href="${product.purchaseLink || "#"}" target="_blank" rel="noopener noreferrer" class="qv__btn qv__btn--ghost">Purchase Now</a>
-        </div>
-      </div>
-    </div>
-  `;
+  const badge = overlay.querySelector(".qv__badge");
+  if (product.badge) {
+    badge.classList.add(product.badge === "New" ? "product-card__badge--new" : "product-card__badge--sale");
+    badge.querySelector("span").textContent = product.badge;
+  } else {
+    badge.remove();
+  }
+
+  const media = overlay.querySelector(".qv__media img");
+  media.src = product.image;
+  media.alt = product.name;
+
+  overlay.querySelector(".qv__cat").textContent = product.category;
+  overlay.querySelector(".qv__name").textContent = product.name;
+
+  const oldEl = overlay.querySelector(".qv__old");
+  if (product.oldPrice) {
+    oldEl.querySelector(".qv__old-val").textContent = product.oldPrice.toFixed(2);
+  } else {
+    oldEl.remove();
+  }
+  overlay.querySelector(".qv__price-val").textContent = product.price.toFixed(2);
+
+  overlay.querySelector(".qv__desc").textContent =
+    `Take a closer look at our ${product.name.toLowerCase()}. This elegant piece from our ${product.category.toLowerCase()} collection is designed for those who appreciate refined beauty and exceptional quality.`;
+
+  overlay.querySelector(".qv__btn--primary").setAttribute("href", routeTo("/product/" + product.slug));
+  overlay.querySelector(".qv__btn--ghost").setAttribute("href", product.purchaseLink || "#");
+
   document.body.appendChild(overlay);
   document.body.style.overflow = "hidden";
 

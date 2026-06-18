@@ -13,10 +13,64 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main class="page-white" id="blog-root"></main>
+    <main class="page-white" id="blog-root">
+      <div class="crumbbar">
+        <div class="container crumb">
+          <a href="index.html">Home</a>
+          <span class="crumb__sep">—</span>
+          <span class="crumb__current">Blogs</span>
+        </div>
+      </div>
+
+      <section data-reveal class="blog container">
+        <div class="blog__head"><h1>Blogs</h1></div>
+        <div id="blog-list-root">
+          <div class="blog__grid" id="blog-grid"></div>
+          <div id="blog-pager"></div>
+        </div>
+      </section>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- Blog listing templates, cloned + filled by blog.js -->
+  <template id="tpl-blog-card">
+    <div data-reveal>
+      <a class="blog-card">
+        <article>
+          <div class="blog-card__media">
+            <img data-src="image" data-alt="title" />
+            <div class="blog-card__tag" data-text="category"></div>
+          </div>
+          <div class="blog-card__body">
+            <h2 class="blog-card__title" data-text="title"></h2>
+            <div class="blog-card__meta">
+              <span>By <b data-text="author"></b></span>
+              <span class="sep">|</span>
+              <span><span data-text="month"></span> <span data-text="day"></span></span>
+            </div>
+          </div>
+        </article>
+      </a>
+    </div>
+  </template>
+
+  <template id="tpl-blog-pager">
+    <div class="pager pager--blog">
+      <button class="pager__round" data-prev>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="pager__nums"></div>
+      <button class="pager__round" data-next>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </template>
+
+  <template id="tpl-blog-pagenum">
+    <button class="pager__num-round"></button>
+  </template>
 
   <script>window.PAGE_ROUTE = "/blog";</script>
   <script src="js/data.js"></script>

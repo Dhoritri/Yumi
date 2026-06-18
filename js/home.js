@@ -1,38 +1,38 @@
-/* Home page — HeroBanner, FeaturedProducts, BannerSection, DiscoverySection */
+/* Home page — HeroBanner, FeaturedProducts, BannerSection, DiscoverySection.
+   Page structure + templates live in index.html; this clones them, fills data,
+   and wires the carousels. */
 
-function heroBannerHtml(slides) {
+function renderHero(slides) {
   const isMobile = window.innerWidth < 768;
-  const slidesHtml = slides
-    .map((slide, index) => {
-      const bg = isMobile && slide.mobileImage ? slide.mobileImage : slide.backgroundImage;
-      const active = index === 0;
-      return `
-      <div class="hero-slide ${active ? "is-active" : ""}" data-index="${index}">
-        <div class="hero-bg" style="background-image:url(${bg});transform:${active ? "scale(1.1)" : "scale(1)"}"></div>
-        <div class="hero__content">
-          <div class="container">
-            <div class="hero-text">
-              <span class="hero-text__sub">${escapeHtml(slide.subtitle)}</span>
-              <h1 class="hero-text__title">${escapeHtml(slide.title)}</h1>
-              <p class="hero-text__desc">${escapeHtml(slide.description)}</p>
-              <a href="${routeTo(slide.buttonLink)}" class="hero-text__btn">${escapeHtml(slide.buttonText)}</a>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    })
-    .join("");
+  const hero = document.getElementById("hero-banner");
+  const dots = document.getElementById("hero-dots");
 
-  const dots = slides
-    .map((_, index) => `<button class="hero-dot" data-index="${index}" aria-label="Go to slide ${index + 1}"></button>`)
-    .join("");
+  slides.forEach((slide, index) => {
+    const node = cloneTpl("tpl-hero-slide");
+    node.setAttribute("data-index", index);
+    if (index === 0) node.classList.add("is-active");
 
-  return `
-    <section class="hero" id="hero-banner">
-      ${slidesHtml}
-      <div class="hero__dots" id="hero-dots">${dots}</div>
-    </section>
-  `;
+    const bg = isMobile && slide.mobileImage ? slide.mobileImage : slide.backgroundImage;
+    const bgEl = node.querySelector(".hero-bg");
+    bgEl.style.backgroundImage = `url(${bg})`;
+    bgEl.style.transform = index === 0 ? "scale(1.1)" : "scale(1)";
+
+    node.querySelector(".hero-text__sub").textContent = slide.subtitle;
+    node.querySelector(".hero-text__title").textContent = slide.title;
+    node.querySelector(".hero-text__desc").textContent = slide.description;
+    const btn = node.querySelector(".hero-text__btn");
+    btn.setAttribute("href", routeTo(slide.buttonLink));
+    btn.textContent = slide.buttonText;
+
+    hero.insertBefore(node, dots);
+  });
+
+  slides.forEach((_, index) => {
+    const dot = cloneTpl("tpl-hero-dot");
+    dot.setAttribute("data-index", index);
+    dot.setAttribute("aria-label", "Go to slide " + (index + 1));
+    dots.appendChild(dot);
+  });
 }
 
 function initHero(slides) {
@@ -80,25 +80,21 @@ function initHero(slides) {
   });
 }
 
-function featuredProductsHtml(featured, config) {
-  const total = featured.length;
-  const cards = featured
-    .map((product) => `<div class="featured__item" style="width:${100 / total}%">${productCardHtml(product)}</div>`)
-    .join("");
+function renderFeatured(featured, config) {
+  document.getElementById("featured-title").textContent = config.featuredProducts.title;
+  document.getElementById("featured-sub").textContent = config.featuredProducts.subtitle;
 
-  return `
-    <section data-reveal class="featured container" id="featured-section">
-      <div class="featured__head">
-        <h2 class="featured__title">${escapeHtml(config.featuredProducts.title)}</h2>
-        <p class="featured__sub">${escapeHtml(config.featuredProducts.subtitle)}</p>
-      </div>
-      <div class="featured__viewport">
-        <div id="featured-track" class="featured__track" style="width:${(total / 4) * 100}%;transform:translateX(0%)">
-          ${cards}
-        </div>
-      </div>
-    </section>
-  `;
+  const total = featured.length;
+  const track = document.getElementById("featured-track");
+  track.style.width = `${(total / 4) * 100}%`;
+  track.style.transform = "translateX(0%)";
+
+  featured.forEach((product) => {
+    const item = cloneTpl("tpl-featured-item");
+    item.style.width = `${100 / total}%`;
+    item.appendChild(renderProductCard(product));
+    track.appendChild(item);
+  });
 }
 
 function initFeatured(featured) {
@@ -148,67 +144,55 @@ function initFeatured(featured) {
   bindQuickViews(document.getElementById("featured-section"), featured);
 }
 
-function bannerSectionHtml(banners) {
-  const items = banners
-    .map((banner) => {
-      const tintClass = banner.bgColor === "bg-[#CCDCD2]" ? "banner__tint--green" : "banner__tint--gray";
-      const subtitle = banner.subtitle ? `<span class="banner__sub">${escapeHtml(banner.subtitle)}</span>` : "";
-      const description = banner.description ? `<p class="banner__desc">${escapeHtml(banner.description)}</p>` : "";
-      return `
-      <div class="banner">
-        <img src="${banner.image}" alt="${escapeHtml(banner.title)}" class="banner__img" />
-        <div class="banner__tint ${tintClass}"></div>
-        <div class="banner__content">
-          ${subtitle}
-          <h2 class="banner__title">${escapeHtml(banner.title)}</h2>
-          ${description}
-          <a href="${routeTo(banner.buttonLink)}" class="banner__btn">${escapeHtml(banner.buttonText)}</a>
-        </div>
-      </div>`;
-    })
-    .join("");
+function renderBanners(banners) {
+  const grid = document.getElementById("banners-grid");
+  banners.forEach((banner) => {
+    const node = cloneTpl("tpl-banner");
+    const tintClass = banner.bgColor === "bg-[#CCDCD2]" ? "banner__tint--green" : "banner__tint--gray";
+    node.querySelector(".banner__tint").classList.add(tintClass);
 
-  return `
-    <section data-reveal class="banners container">
-      <div class="banners__grid">${items}</div>
-    </section>
-  `;
+    const img = node.querySelector(".banner__img");
+    img.src = banner.image;
+    img.alt = banner.title;
+
+    const sub = node.querySelector(".banner__sub");
+    if (banner.subtitle) sub.textContent = banner.subtitle; else sub.remove();
+
+    node.querySelector(".banner__title").textContent = banner.title;
+
+    const desc = node.querySelector(".banner__desc");
+    if (banner.description) desc.textContent = banner.description; else desc.remove();
+
+    const btn = node.querySelector(".banner__btn");
+    btn.setAttribute("href", routeTo(banner.buttonLink));
+    btn.textContent = banner.buttonText;
+
+    grid.appendChild(node);
+  });
 }
 
-function discoverySectionHtml(data) {
-  const items = data.items
-    .map(
-      (item) => `
-      <div class="discovery__item">
-        <a href="${routeTo(item.linkUrl)}" class="discovery__media">
-          <div class="discovery__media-inner">
-            <img src="${item.image}" alt="${escapeHtml(item.title)}" />
-          </div>
-        </a>
-        <div class="discovery__body">
-          <h3 class="discovery__name">${escapeHtml(item.title)}</h3>
-          <a href="${routeTo(item.linkUrl)}" class="discovery__link">
-            ${escapeHtml(item.linkText)}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-      </div>`
-    )
-    .join("");
+function renderDiscovery(data) {
+  document.getElementById("discovery-title").textContent = data.heading;
+  document.getElementById("discovery-desc").textContent = data.description;
 
-  return `
-    <section data-reveal class="discovery container">
-      <div class="discovery__head">
-        <h2 class="discovery__title">${escapeHtml(data.heading)}</h2>
-        <p class="discovery__desc">${escapeHtml(data.description)}</p>
-      </div>
-      <div class="discovery__grid">${items}</div>
-    </section>
-  `;
+  const grid = document.getElementById("discovery-grid");
+  data.items.forEach((item) => {
+    const node = cloneTpl("tpl-discovery-item");
+    node.querySelector(".discovery__media").setAttribute("href", routeTo(item.linkUrl));
+
+    const img = node.querySelector("img");
+    img.src = item.image;
+    img.alt = item.title;
+
+    node.querySelector(".discovery__name").textContent = item.title;
+    node.querySelector(".discovery__link").setAttribute("href", routeTo(item.linkUrl));
+    node.querySelector(".discovery__link-text").textContent = item.linkText;
+
+    grid.appendChild(node);
+  });
 }
 
 async function initPage() {
-  const root = document.getElementById("home-root");
   const [slides, featured, config, banners, discovery] = await Promise.all([
     getHeroSlides(),
     getFeaturedProducts(),
@@ -217,11 +201,10 @@ async function initPage() {
     getDiscoveryData(),
   ]);
 
-  root.innerHTML =
-    heroBannerHtml(slides) +
-    featuredProductsHtml(featured, config) +
-    bannerSectionHtml(banners) +
-    discoverySectionHtml(discovery);
+  renderHero(slides);
+  renderFeatured(featured, config);
+  renderBanners(banners);
+  renderDiscovery(discovery);
 
   initHero(slides);
   initFeatured(featured);

@@ -13,10 +13,168 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main class="page-white" id="product-root"></main>
+    <main class="page-white" id="product-root">
+      <div id="pd-notfound" class="container pd__notfound" hidden>
+        <h2>Product Not Found</h2>
+        <a href="shop.html">Back to Shop</a>
+      </div>
+
+      <div id="pd-content" hidden>
+        <div class="crumbbar">
+          <div class="container crumb">
+            <a href="index.html">Home</a>
+            <span class="crumb__sep">—</span>
+            <a href="shop.html">Shop</a>
+            <span class="crumb__sep">—</span>
+            <span class="crumb__current crumb__current--cap" data-text="name"></span>
+          </div>
+        </div>
+
+        <div class="container pd">
+          <div class="pd__top">
+            <div class="pd__gallery">
+              <div class="pd__main">
+                <div class="pd__badge" id="pd-badge" hidden><span></span></div>
+                <img id="pd-main-image" data-alt="name" alt="" />
+              </div>
+              <div class="pd__thumbs" id="pd-thumbs"></div>
+            </div>
+
+            <div class="pd__info">
+              <div class="pd__prices">
+                <span class="pd__old" id="pd-old" hidden><span class="taka">৳ </span><span id="pd-old-val"></span></span>
+                <span class="pd__price"><span class="taka">৳ </span><span id="pd-price-val"></span></span>
+              </div>
+              <h1 class="pd__name" data-text="name"></h1>
+
+              <p class="pd__short-desc" data-text="shortDescription"></p>
+              <p class="pd__long-desc" data-text="longDescription"></p>
+
+              <div id="pd-variants-wrap"></div>
+
+              <div class="pd__buy-wrap">
+                <a id="pd-buy" target="_blank" rel="noopener noreferrer" class="pd__buy">Buy it now</a>
+              </div>
+
+              <div class="pd__meta">
+                <p>Category: <span id="pd-category"></span></p>
+                <p>Tags: <span id="pd-tags"></span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pd__tabs">
+            <div class="pd__tabnav">
+              <button id="pd-tab-description" class="pd__tab">Description</button>
+              <button id="pd-tab-videos" class="pd__tab">Videos</button>
+            </div>
+            <div class="pd__panel" id="pd-tab-panel"></div>
+          </div>
+
+          <div class="pd__related" id="pd-related" hidden>
+            <h2 class="pd__related-title">You May Also Like</h2>
+            <div class="pd__related-grid" id="pd-related-grid"></div>
+          </div>
+        </div>
+      </div>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- Product detail templates, cloned + filled by product.js -->
+  <template id="tpl-pd-thumb">
+    <div class="pd__thumb"><img alt="" /></div>
+  </template>
+
+  <template id="tpl-pd-variants">
+    <div class="pd__variants">
+      <span class="pd__variants-label"></span>
+      <div class="pd__variant-btns" id="pd-variants"></div>
+    </div>
+  </template>
+
+  <template id="tpl-pd-variant">
+    <button class="pd__variant"></button>
+  </template>
+
+  <template id="tpl-pd-description">
+    <div class="animate-fadeIn"><p></p></div>
+  </template>
+
+  <template id="tpl-pd-videos">
+    <div class="pd__videos animate-fadeIn"></div>
+  </template>
+
+  <template id="tpl-pd-video">
+    <div class="pd__video">
+      <iframe width="100%" height="100%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+    </div>
+  </template>
+
+  <!-- Shared product card -->
+  <template id="tpl-product-card">
+    <div class="product-card" data-product-card>
+      <a class="product-card__link">
+        <div class="product-card__media">
+          <div class="product-card__badge"><span></span></div>
+          <div class="product-card__imgwrap">
+            <img class="product-card__img product-card__img--main" alt="" />
+            <img class="product-card__img product-card__img--alt" alt="" />
+          </div>
+          <div class="product-card__quick">
+            <button type="button" class="product-card__quick-btn quickview-btn" title="Quick View">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="product-card__quick--mobile">
+            <button type="button" class="product-card__quick-btn quickview-btn" title="Quick View">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__prices">
+            <span class="product-card__old"><span class="taka">৳</span> <span class="product-card__old-val"></span></span>
+            <span class="product-card__price"><span class="taka">৳</span> <span class="product-card__price-val"></span></span>
+          </div>
+          <h3 class="product-card__name"></h3>
+        </div>
+      </a>
+    </div>
+  </template>
+
+  <!-- Shared quick-view modal -->
+  <template id="tpl-quickview">
+    <div class="qv">
+      <div class="qv__backdrop" data-qv-close></div>
+      <div class="qv__panel">
+        <button data-qv-close class="qv__close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="qv__media">
+          <div class="qv__badge"><span></span></div>
+          <img alt="" />
+        </div>
+        <div class="qv__body">
+          <div>
+            <span class="qv__cat"></span>
+            <h2 class="qv__name"></h2>
+            <div class="qv__prices">
+              <span class="qv__old"><span class="taka">৳ </span><span class="qv__old-val"></span></span>
+              <span class="qv__price"><span class="taka">৳ </span><span class="qv__price-val"></span></span>
+            </div>
+            <div class="qv__rule"></div>
+            <p class="qv__desc"></p>
+          </div>
+          <div class="qv__actions">
+            <a class="qv__btn qv__btn--primary">View Details</a>
+            <a target="_blank" rel="noopener noreferrer" class="qv__btn qv__btn--ghost">Purchase Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
 
   <script>window.PAGE_ROUTE = "/shop";</script>
   <script src="js/data.js"></script>

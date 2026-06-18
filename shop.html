@@ -13,10 +13,175 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main class="page-white" id="shop-root"></main>
+    <main class="page-white" id="shop-root">
+      <div class="crumbbar">
+        <div class="container crumb">
+          <a href="index.html">Home</a>
+          <span class="crumb__sep">—</span>
+          <span class="crumb__current">Products</span>
+        </div>
+      </div>
+
+      <section class="shop container">
+        <div class="shop__head">
+          <h1 class="shop__title">Products</h1>
+        </div>
+
+        <div id="shop-searchbar"></div>
+
+        <div class="shop__toolbar">
+          <div class="shop__toolbar-left">
+            <button class="shop__filter-btn" id="shop-filter-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>
+              <span>Filter</span>
+            </button>
+            <p class="shop__count">We found <b class="shop__count-num"></b> products available for you.</p>
+          </div>
+
+          <div class="shop__toolbar-right">
+            <div class="shop__views">
+              <button class="shop__view-btn is-active" id="shop-view-grid" aria-label="Grid view">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              </button>
+              <button class="shop__view-btn" id="shop-view-list" aria-label="List view">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <div class="shop__sort-wrap">
+              <select id="shop-sort" class="shop__sort">
+                <option value="a-z">Alphabetically, A-Z</option>
+                <option value="z-a">Alphabetically, Z-A</option>
+                <option value="low-high">Price, low to high</option>
+                <option value="high-low">Price, high to low</option>
+              </select>
+              <span class="shop__sort-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter drawer — opens from the toolbar "Filter" button -->
+        <div id="shop-mobile-sidebar" class="shop__drawer" hidden>
+          <div id="shop-mobile-overlay" class="shop__drawer-overlay"></div>
+          <aside class="shop__drawer-panel">
+            <div class="shop__drawer-head">
+              <h4>Filter</h4>
+              <button id="shop-mobile-close" class="shop__drawer-close" aria-label="Close filter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
+            </div>
+            <div class="shop__drawer-section">
+              <h5 class="shop__drawer-section-title">Filter By Category</h5>
+              <ul class="shop__catlist" id="shop-cats-mobile"></ul>
+            </div>
+          </aside>
+        </div>
+
+        <div class="shop__main">
+          <div class="shop__grid" id="shop-grid"></div>
+          <div id="shop-pager"></div>
+        </div>
+      </section>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- Shop templates, cloned + filled by shop.js -->
+  <template id="tpl-shop-searchbar">
+    <div class="shop__searchbar">
+      <p>Showing results for <b class="shop__searchbar-q"></b><span class="shop__searchbar-count"></span></p>
+      <a href="shop.html" class="shop__searchbar-clear">Clear Search</a>
+    </div>
+  </template>
+
+  <template id="tpl-cat-item">
+    <li class="cat-item">
+      <span class="cat-item__name"></span>
+      <span class="cat-item__count"></span>
+    </li>
+  </template>
+
+  <template id="tpl-shop-pager">
+    <div class="pager">
+      <button class="pager__btn" data-prev>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <button class="pager__btn" data-next>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </template>
+
+  <template id="tpl-shop-pagenum">
+    <button class="pager__num"></button>
+  </template>
+
+  <!-- Shared product card -->
+  <template id="tpl-product-card">
+    <div class="product-card" data-product-card>
+      <a class="product-card__link">
+        <div class="product-card__media">
+          <div class="product-card__badge"><span></span></div>
+          <div class="product-card__imgwrap">
+            <img class="product-card__img product-card__img--main" alt="" />
+            <img class="product-card__img product-card__img--alt" alt="" />
+          </div>
+          <div class="product-card__quick">
+            <button type="button" class="product-card__quick-btn quickview-btn" title="Quick View">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <div class="product-card__quick--mobile">
+            <button type="button" class="product-card__quick-btn quickview-btn" title="Quick View">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__prices">
+            <span class="product-card__old"><span class="taka">৳</span> <span class="product-card__old-val"></span></span>
+            <span class="product-card__price"><span class="taka">৳</span> <span class="product-card__price-val"></span></span>
+          </div>
+          <h3 class="product-card__name"></h3>
+        </div>
+      </a>
+    </div>
+  </template>
+
+  <!-- Shared quick-view modal -->
+  <template id="tpl-quickview">
+    <div class="qv">
+      <div class="qv__backdrop" data-qv-close></div>
+      <div class="qv__panel">
+        <button data-qv-close class="qv__close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="qv__media">
+          <div class="qv__badge"><span></span></div>
+          <img alt="" />
+        </div>
+        <div class="qv__body">
+          <div>
+            <span class="qv__cat"></span>
+            <h2 class="qv__name"></h2>
+            <div class="qv__prices">
+              <span class="qv__old"><span class="taka">৳ </span><span class="qv__old-val"></span></span>
+              <span class="qv__price"><span class="taka">৳ </span><span class="qv__price-val"></span></span>
+            </div>
+            <div class="qv__rule"></div>
+            <p class="qv__desc"></p>
+          </div>
+          <div class="qv__actions">
+            <a class="qv__btn qv__btn--primary">View Details</a>
+            <a target="_blank" rel="noopener noreferrer" class="qv__btn qv__btn--ghost">Purchase Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
 
   <script>window.PAGE_ROUTE = "/shop";</script>
   <script src="js/data.js"></script>

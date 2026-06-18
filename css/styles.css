@@ -1702,124 +1702,57 @@ html.js-anim [data-reveal].in-view {
   }
 }
 
-.shop__tab {
-  position: fixed;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 40;
-}
-@media (min-width: 1024px) {
-  .shop__tab {
-    display: none;
-  }
-}
-.shop__tab-btn {
-  background: #000;
-  color: #fff;
-  padding: 1.5rem 0.625rem;
-  border-radius: 0 0.5rem 0.5rem 0;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  transition: transform 0.15s;
-}
-.shop__tab-btn:active {
-  transform: translateY(-50%) scale(0.95);
-}
-.shop__tab-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  transform: rotate(180deg);
-  writing-mode: vertical-lr;
-}
-
-.shop__mobile-sidebar[hidden] {
+/* Filter drawer — slides in from the left on every screen size */
+.shop__drawer[hidden] {
   display: none;
 }
-.shop__mobile-overlay {
+.shop__drawer-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
   z-index: 90;
 }
-@media (min-width: 1024px) {
-  .shop__mobile-overlay {
-    display: none;
-  }
-}
-.shop__mobile-aside {
+.shop__drawer-panel {
   position: fixed;
   inset: 0 auto 0 0;
-  width: 80%;
-  max-width: 300px;
+  width: 340px;
+  max-width: 85%;
   background: #fff;
   z-index: 100;
-  padding: 2rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
   animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@media (min-width: 1024px) {
-  .shop__mobile-aside {
-    display: none;
-  }
-}
-.shop__mobile-head {
+.shop__drawer-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f5f5f5;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #eee;
 }
-.shop__mobile-head h4 {
+.shop__drawer-head h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #171717;
+}
+.shop__drawer-close {
+  padding: 4px;
+  color: #525252;
+  transition: transform 0.3s;
+}
+.shop__drawer-close:hover {
+  transform: rotate(90deg);
+}
+.shop__drawer-section-title {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: #171717;
-}
-.shop__mobile-close {
-  padding: 4px;
-  transition: transform 0.3s;
-}
-.shop__mobile-close:hover {
-  transform: rotate(90deg);
-}
-
-.shop__aside {
-  display: none;
-}
-@media (min-width: 1024px) {
-  .shop__aside {
-    display: block;
-    width: 25%;
-  }
-}
-.shop__aside-sticky {
-  position: sticky;
-  top: 8rem;
-}
-.shop__aside-title {
-  font-size: 17px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  margin-bottom: 2rem;
-  color: #171717;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.shop__aside-title span {
-  width: 2rem;
-  height: 1px;
-  background: #000;
+  margin-bottom: 1rem;
 }
 
 .shop__catlist {
@@ -1893,40 +1826,88 @@ html.js-anim [data-reveal].in-view {
 .shop__main {
   width: 100%;
 }
-@media (min-width: 1024px) {
-  .shop__main {
-    width: 75%;
+.shop__head {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+@media (min-width: 768px) {
+  .shop__head {
+    margin-bottom: 3.5rem;
+  }
+}
+.shop__title {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #000;
+}
+@media (min-width: 768px) {
+  .shop__title {
+    font-size: 40px;
   }
 }
 .shop__toolbar {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 1.25rem;
   margin-bottom: 3rem;
-  gap: 1.5rem;
 }
 @media (min-width: 768px) {
   .shop__toolbar {
     flex-direction: row;
+    align-items: center;
   }
 }
-.shop__view-btn {
-  border: 1px solid #e5e5e5;
-  padding: 0.625rem;
-  background: #f8f8f8;
-  color: #000;
+.shop__toolbar-left,
+.shop__toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.shop__toolbar-left {
+  flex-wrap: wrap;
+}
+.shop__filter-btn {
   display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 15px;
+  font-weight: 700;
+  color: #000;
+  transition: opacity 0.2s;
+}
+.shop__filter-btn:hover {
+  opacity: 0.6;
+}
+.shop__count {
+  color: #9ca3af;
+  font-size: 15px;
+}
+.shop__count-num {
+  color: #171717;
+  font-weight: 700;
+}
+.shop__views {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.shop__view-btn {
+  padding: 0.5rem;
+  color: #c4c4c4;
+  display: inline-flex;
+  transition: color 0.2s;
+}
+.shop__view-btn:hover {
+  color: #525252;
+}
+.shop__view-btn.is-active {
+  color: #000;
 }
 .shop__sort-wrap {
   position: relative;
-  width: 100%;
-  min-width: 220px;
-}
-@media (min-width: 768px) {
-  .shop__sort-wrap {
-    width: auto;
-  }
+  min-width: 210px;
 }
 .shop__sort {
   width: 100%;
@@ -3410,4 +3391,87 @@ html.js-anim [data-reveal].in-view {
   font-style: italic;
   color: #a3a3a3;
   font-size: 0.875rem;
+}
+
+/* ===========================================================================
+   Horizontal gutters (fix)
+   Several section rules use the `padding: Nrem 0` shorthand, which
+   unintentionally resets the shared `.container` side padding to 0. That
+   flushed all content/cards to the screen edge on mobile and made the home
+   featured carousel (margin: 0 -1rem) overflow → horizontal scroll.
+   Re-assert the container side padding here (physical longhands, last in the
+   file) so it wins over those shorthands by source order, and give the cards
+   a little breathing room from the screen edge.
+   =========================================================================== */
+.container {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 768px) {
+  .container {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* A touch more internal padding on cards so content isn't tight. */
+.product-card__info {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Shop list-view toggle — one product per row, image left / info right.
+   Overrides the grid media-query columns by source order. */
+.shop__grid--list {
+  grid-template-columns: 1fr;
+  row-gap: 1.5rem;
+}
+.shop__grid--list .product-card__link {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.shop__grid--list .product-card__media {
+  width: 140px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+.shop__grid--list .product-card__info {
+  flex: 1;
+  gap: 0.5rem;
+  align-items: flex-start;
+  text-align: left;
+}
+.shop__grid--list .product-card__prices {
+  justify-content: flex-start;
+}
+.shop__grid--list .product-card__name {
+  text-align: left;
+  font-size: 1rem;
+}
+@media (min-width: 768px) {
+  .shop__grid--list .product-card__media {
+    width: 180px;
+  }
+}
+
+/* Product detail — short + long description between the name and Buy button. */
+.pd__short-desc {
+  margin-top: 1.25rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: #404040;
+  line-height: 1.6;
+}
+.pd__long-desc {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+  color: #7e7e7e;
+  line-height: 1.75;
 }

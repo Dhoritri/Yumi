@@ -1,61 +1,39 @@
-/* FAQ page — accordion (default open id = 1) */
+/* FAQ page — accordion (default open id = 1).
+   Page structure + templates live in faq.html; this clones them, fills data,
+   and wires the open/close behavior. */
 let faqOpenIndex = 1;
 
 async function initPage() {
   const root = document.getElementById("faq-root");
   const data = await getFAQData();
+  applyBindings(root, data);
 
-  const renderAccordion = () => {
-    const categories = data.categories
-      .map((category) => {
-        const questions = category.questions
-          .map((q) => {
-            const isOpen = faqOpenIndex === q.id;
-            return `
-            <div class="faq__q${isOpen ? " is-open" : ""}">
-              <button data-faq="${q.id}" class="faq__q-btn">
-                <span class="faq__q-text">${escapeHtml(q.question)}</span>
-                <span class="faq__q-icon">+</span>
-              </button>
-              <div class="faq__a"><p>${escapeHtml(q.answer)}</p></div>
-            </div>`;
-          })
-          .join("");
-        return `
-        <div class="faq__cat">
-          <h2 class="faq__cat-title">${escapeHtml(category.name)}</h2>
-          <div class="faq__items">${questions}</div>
-        </div>`;
-      })
-      .join("");
+  const list = document.getElementById("faq-list");
 
-    document.getElementById("faq-list").innerHTML = categories;
-    document.querySelectorAll("[data-faq]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const id = parseInt(btn.getAttribute("data-faq"), 10);
-        faqOpenIndex = faqOpenIndex === id ? null : id;
-        renderAccordion();
-      });
+  const syncOpen = () => {
+    list.querySelectorAll(".faq__q").forEach((el) => {
+      el.classList.toggle("is-open", Number(el.getAttribute("data-faq-id")) === faqOpenIndex);
     });
   };
 
-  root.innerHTML = `
-    <div class="crumbbar">
-      <div class="container crumb">
-        <a href="index.html">Home</a>
-        <span class="crumb__sep">—</span>
-        <span class="crumb__current">FAQ</span>
-      </div>
-    </div>
+  data.categories.forEach((category) => {
+    const cat = cloneTpl("tpl-faq-cat");
+    applyBindings(cat, category);
+    const items = cat.querySelector(".faq__items");
 
-    <section data-reveal class="faq container">
-      <div class="faq__head">
-        <h1 class="faq__title">${escapeHtml(data.title)}</h1>
-        <p class="faq__desc">${escapeHtml(data.description)}</p>
-      </div>
-      <div class="faq__list" id="faq-list"></div>
-    </section>
-  `;
+    category.questions.forEach((q) => {
+      const qEl = cloneTpl("tpl-faq-q");
+      applyBindings(qEl, q);
+      qEl.setAttribute("data-faq-id", q.id);
+      qEl.querySelector(".faq__q-btn").addEventListener("click", () => {
+        faqOpenIndex = faqOpenIndex === q.id ? null : q.id;
+        syncOpen();
+      });
+      items.appendChild(qEl);
+    });
 
-  renderAccordion();
+    list.appendChild(cat);
+  });
+
+  syncOpen();
 }

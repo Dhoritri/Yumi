@@ -13,10 +13,44 @@
 <body>
   <div id="navbar-root"></div>
   <main class="site-main">
-    <main class="page-white" id="faq-root"></main>
+    <main class="page-white" id="faq-root">
+      <div class="crumbbar">
+        <div class="container crumb">
+          <a href="index.html">Home</a>
+          <span class="crumb__sep">—</span>
+          <span class="crumb__current">FAQ</span>
+        </div>
+      </div>
+
+      <section data-reveal class="faq container">
+        <div class="faq__head">
+          <h1 class="faq__title" data-text="title"></h1>
+          <p class="faq__desc" data-text="description"></p>
+        </div>
+        <div class="faq__list" id="faq-list"></div>
+      </section>
+    </main>
   </main>
   <div id="footer-root"></div>
   <div id="scrolltop-root"></div>
+
+  <!-- FAQ templates, cloned + filled by faq.js -->
+  <template id="tpl-faq-cat">
+    <div class="faq__cat">
+      <h2 class="faq__cat-title" data-text="name"></h2>
+      <div class="faq__items"></div>
+    </div>
+  </template>
+
+  <template id="tpl-faq-q">
+    <div class="faq__q">
+      <button class="faq__q-btn">
+        <span class="faq__q-text" data-text="question"></span>
+        <span class="faq__q-icon">+</span>
+      </button>
+      <div class="faq__a"><p data-text="answer"></p></div>
+    </div>
+  </template>
 
   <script>window.PAGE_ROUTE = "/faq";</script>
   <script src="js/data.js"></script>

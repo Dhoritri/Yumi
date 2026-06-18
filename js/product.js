@@ -1,4 +1,6 @@
-/* Product detail page — by ?slug=, with variants, gallery, tabs, related */
+/* Product detail page — by ?slug=, with variants, gallery, tabs, related.
+   Page structure + templates live in product.html; this fills the bind hooks,
+   clones the dynamic pieces, and wires the interactions. */
 const productState = {
   products: [],
   product: null,
@@ -14,20 +16,20 @@ function renderGallery() {
 
   document.getElementById("pd-main-image").src = mainImage;
 
-  document.getElementById("pd-thumbs").innerHTML = activeGallery
-    .map(
-      (img, idx) => `
-      <div data-thumb="${escapeHtml(img)}" class="pd__thumb${mainImage === img ? " is-active" : ""}">
-        <img src="${img}" alt="Gallery ${idx}" />
-      </div>`
-    )
-    .join("");
-
-  document.querySelectorAll("[data-thumb]").forEach((el) => {
-    el.addEventListener("click", () => {
-      productState.mainImage = el.getAttribute("data-thumb");
+  const thumbs = document.getElementById("pd-thumbs");
+  thumbs.innerHTML = "";
+  activeGallery.forEach((img, idx) => {
+    const node = cloneTpl("tpl-pd-thumb");
+    node.setAttribute("data-thumb", img);
+    if (mainImage === img) node.classList.add("is-active");
+    const im = node.querySelector("img");
+    im.src = img;
+    im.alt = "Gallery " + idx;
+    node.addEventListener("click", () => {
+      productState.mainImage = img;
       renderGallery();
     });
+    thumbs.appendChild(node);
   });
 }
 
@@ -48,143 +50,91 @@ function renderTabs() {
   document.getElementById("pd-tab-videos").classList.toggle("is-active", tab === "videos");
 
   const panel = document.getElementById("pd-tab-panel");
+  panel.innerHTML = "";
   if (tab === "description") {
-    panel.innerHTML = `<div class="animate-fadeIn"><p>${escapeHtml(product.description)}</p></div>`;
+    const node = cloneTpl("tpl-pd-description");
+    node.querySelector("p").textContent = product.description;
+    panel.appendChild(node);
   } else {
-    const vids = product.videos
-      .map(
-        (vidId, idx) => `
-        <div class="pd__video">
-          <iframe width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/${escapeHtml(vidId)}" title="Product Video ${idx + 1}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
-        </div>`
-      )
-      .join("");
-    panel.innerHTML = `<div class="pd__videos animate-fadeIn">${vids}</div>`;
+    const wrap = cloneTpl("tpl-pd-videos");
+    product.videos.forEach((vidId, idx) => {
+      const v = cloneTpl("tpl-pd-video");
+      const iframe = v.querySelector("iframe");
+      iframe.src = "https://www.youtube-nocookie.com/embed/" + vidId;
+      iframe.title = "Product Video " + (idx + 1);
+      wrap.appendChild(v);
+    });
+    panel.appendChild(wrap);
   }
 }
 
 async function initPage() {
-  const root = document.getElementById("product-root");
   const slug = getQueryParam("slug");
   productState.products = await getProducts();
   const product = productState.products.find((p) => p.slug === slug);
 
   if (!product) {
-    root.innerHTML = `
-      <div class="container pd__notfound">
-        <h2>Product Not Found</h2>
-        <a href="shop.html">Back to Shop</a>
-      </div>`;
+    document.getElementById("pd-notfound").hidden = false;
     return;
   }
+
+  const content = document.getElementById("pd-content");
+  content.hidden = false;
 
   productState.product = product;
   productState.selectedVariant = (product.variants && product.variants[0]) || null;
   productState.mainImage = (productState.selectedVariant && productState.selectedVariant.image) || product.image;
   document.title = product.name;
 
-  const otherCategories = productState.products.filter((p) => p.category !== product.category && p.id !== product.id);
-  const shuffled = otherCategories.sort(() => 0.5 - Math.random());
-  const relatedProducts = shuffled.slice(0, 4);
+  applyBindings(content, product);
 
-  const badgeClass = product.badge === "New" ? "product-card__badge--new" : "product-card__badge--sale";
-  const badge = product.badge
-    ? `<div class="pd__badge ${badgeClass}"><span>${escapeHtml(product.badge)}</span></div>`
-    : "";
-
-  const oldPrice = product.oldPrice
-    ? `<span class="pd__old"><span class="taka">৳ </span>${product.oldPrice.toFixed(2)}</span>`
-    : "";
-
-  let variantsHtml = "";
-  if (product.variants && product.variants.length > 0) {
-    const buttons = product.variants
-      .map((variant) => `<button data-variant="${escapeHtml(variant.name)}" class="pd__variant">${escapeHtml(variant.name)}</button>`)
-      .join("");
-    variantsHtml = `
-      <div class="pd__variants">
-        <span class="pd__variants-label">${escapeHtml(product.variantType || "Choose Option")}</span>
-        <div class="pd__variant-btns" id="pd-variants">${buttons}</div>
-      </div>`;
+  if (product.badge) {
+    const badge = document.getElementById("pd-badge");
+    badge.hidden = false;
+    badge.classList.add(product.badge === "New" ? "product-card__badge--new" : "product-card__badge--sale");
+    badge.querySelector("span").textContent = product.badge;
   }
 
-  const related =
-    relatedProducts.length > 0
-      ? `<div class="pd__related">
-          <h2 class="pd__related-title">You May Also Like</h2>
-          <div class="pd__related-grid">${relatedProducts.map((p) => productCardHtml(p)).join("")}</div>
-        </div>`
-      : "";
+  document.getElementById("pd-price-val").textContent = product.price.toFixed(2);
+  if (product.oldPrice) {
+    document.getElementById("pd-old").hidden = false;
+    document.getElementById("pd-old-val").textContent = product.oldPrice.toFixed(2);
+  }
 
-  root.innerHTML = `
-    <div class="crumbbar">
-      <div class="container crumb">
-        <a href="index.html">Home</a>
-        <span class="crumb__sep">—</span>
-        <a href="shop.html">Shop</a>
-        <span class="crumb__sep">—</span>
-        <span class="crumb__current crumb__current--cap">${escapeHtml(product.name)}</span>
-      </div>
-    </div>
+  document.getElementById("pd-buy").setAttribute("href", product.purchaseLink || "#");
+  document.getElementById("pd-category").textContent = product.category;
+  document.getElementById("pd-tags").textContent = product.tags.join(", ");
 
-    <div class="container pd">
-      <div class="pd__top">
-        <div class="pd__gallery">
-          <div class="pd__main">
-            ${badge}
-            <img id="pd-main-image" src="${productState.mainImage}" alt="${escapeHtml(product.name)}" />
-          </div>
-          <div class="pd__thumbs" id="pd-thumbs"></div>
-        </div>
-
-        <div class="pd__info">
-          <div class="pd__prices">
-            ${oldPrice}
-            <span class="pd__price"><span class="taka">৳ </span>${product.price.toFixed(2)}</span>
-          </div>
-          <h1 class="pd__name">${escapeHtml(product.name)}</h1>
-
-          ${variantsHtml}
-
-          <div class="pd__buy-wrap">
-            <a href="${product.purchaseLink || "#"}" target="_blank" rel="noopener noreferrer" class="pd__buy">Buy it now</a>
-          </div>
-
-          <div class="pd__meta">
-            <p>Category: <span>${escapeHtml(product.category)}</span></p>
-            <p>Tags: <span>${escapeHtml(product.tags.join(", "))}</span></p>
-          </div>
-        </div>
-      </div>
-
-      <div class="pd__tabs">
-        <div class="pd__tabnav">
-          <button id="pd-tab-description" class="pd__tab">Description</button>
-          <button id="pd-tab-videos" class="pd__tab">Videos</button>
-        </div>
-        <div class="pd__panel" id="pd-tab-panel"></div>
-      </div>
-
-      ${related}
-    </div>
-  `;
-
-  renderGallery();
-  renderVariants();
-  renderTabs();
-
-  const variantsContainer = document.getElementById("pd-variants");
-  if (variantsContainer) {
-    variantsContainer.querySelectorAll("[data-variant]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const name = btn.getAttribute("data-variant");
-        productState.selectedVariant = product.variants.find((v) => v.name === name) || null;
+  if (product.variants && product.variants.length > 0) {
+    const wrap = cloneTpl("tpl-pd-variants");
+    wrap.querySelector(".pd__variants-label").textContent = product.variantType || "Choose Option";
+    const btns = wrap.querySelector("#pd-variants");
+    product.variants.forEach((variant) => {
+      const b = cloneTpl("tpl-pd-variant");
+      b.setAttribute("data-variant", variant.name);
+      b.textContent = variant.name;
+      b.addEventListener("click", () => {
+        productState.selectedVariant = product.variants.find((v) => v.name === variant.name) || null;
         productState.mainImage = productState.selectedVariant ? productState.selectedVariant.image : product.image;
         renderVariants();
         renderGallery();
       });
+      btns.appendChild(b);
     });
+    document.getElementById("pd-variants-wrap").appendChild(wrap);
   }
+
+  const otherCategories = productState.products.filter((p) => p.category !== product.category && p.id !== product.id);
+  const relatedProducts = otherCategories.sort(() => 0.5 - Math.random()).slice(0, 4);
+  if (relatedProducts.length > 0) {
+    document.getElementById("pd-related").hidden = false;
+    const grid = document.getElementById("pd-related-grid");
+    relatedProducts.forEach((p) => grid.appendChild(renderProductCard(p)));
+  }
+
+  renderGallery();
+  renderVariants();
+  renderTabs();
 
   document.getElementById("pd-tab-description").addEventListener("click", () => {
     productState.activeTab = "description";
@@ -195,5 +145,5 @@ async function initPage() {
     renderTabs();
   });
 
-  bindQuickViews(root, productState.products);
+  bindQuickViews(content, productState.products);
 }
