@@ -58,7 +58,7 @@ static-site/
     ├── api.js          # data-access layer — ports /src/services/api.ts
     ├── main.js         # shared Navbar, Footer, ScrollToTop, ProductCard, quick-view
     ├── home.js         # hero carousel, featured slider, banners, discovery
-    ├── shop.js         # filtering, sorting, pagination
+    ├── shop.js         # filtering, sorting, pagination, grid/list views
     ├── product.js      # gallery, variants, tabs, related
     ├── blog.js         # listing + pagination
     ├── blog-detail.js  # article + prev/next + related
@@ -72,3 +72,9 @@ returns mock data from `data.js` and contains the commented-out `fetch()` call
 showing exactly where the real endpoint goes. Set the API base by defining
 `window.NEXT_PUBLIC_API_URL` before `api.js` loads, then uncomment the `fetch`
 blocks and delete the mock `return`.
+
+Each product carries a `shortDescription` field. It is rendered on the product
+detail page (`.pd__short-desc`) and, dynamically from the same field, under the
+product name in the shop **list view** — so a single backend value drives both.
+If your API returns only a long `description`, change the fallback in
+`renderProductCard` (`js/main.js`) to `product.shortDescription || product.description`.

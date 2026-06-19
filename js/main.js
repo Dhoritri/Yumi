@@ -457,6 +457,10 @@ function renderProductCard(product) {
   priceEl.querySelector(".product-card__price-val").textContent = product.price.toFixed(2);
 
   card.querySelector(".product-card__name").textContent = product.name;
+
+  const descEl = card.querySelector(".product-card__desc");
+  if (descEl) descEl.textContent = product.shortDescription || "";
+
   return card;
 }
 

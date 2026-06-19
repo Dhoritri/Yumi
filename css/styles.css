@@ -3455,6 +3455,22 @@ html.js-anim [data-reveal].in-view {
   text-align: left;
   font-size: 1rem;
 }
+/* Short description: only shown in list view, hidden in grid/quick cards. */
+.product-card__desc {
+  display: none;
+}
+.shop__grid--list .product-card__desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
 @media (min-width: 768px) {
   .shop__grid--list .product-card__media {
     width: 180px;
