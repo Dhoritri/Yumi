@@ -2129,7 +2129,7 @@ html.js-anim [data-reveal].in-view {
   font-size: 1.875rem;
   font-weight: 600;
   color: #000;
-  margin-bottom: 1.5rem;
+  /* margin-bottom: 1.5rem; */
 }
 @media (min-width: 768px) {
   .pd__name {
@@ -3479,7 +3479,7 @@ html.js-anim [data-reveal].in-view {
 
 /* Product detail — short + long description between the name and Buy button. */
 .pd__short-desc {
-  margin-top: 1.25rem;
+  margin-top: 1rem;
   font-size: 1.0625rem;
   font-weight: 500;
   color: #404040;
@@ -3487,6 +3487,7 @@ html.js-anim [data-reveal].in-view {
 }
 .pd__long-desc {
   margin-top: 1rem;
+  margin-bottom: 2rem;
   font-size: 0.9375rem;
   color: #7e7e7e;
   line-height: 1.75;
