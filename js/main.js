@@ -405,7 +405,7 @@ function renderScrollToTop() {
     if (window.scrollY > 300) wrap.classList.add("is-visible");
     else wrap.classList.remove("is-visible");
     const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = Math.min(100, Math.ceil((window.scrollY / totalHeight) * 100));
+    const pct = totalHeight > 0 ? Math.min(100, Math.ceil((window.scrollY / totalHeight) * 100)) : 0;
     progress.style.strokeDashoffset = circumference - (pct / 100) * circumference;
   };
   window.addEventListener("scroll", onScroll);

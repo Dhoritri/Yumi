@@ -2783,7 +2783,7 @@ html.js-anim [data-reveal].in-view {
 .related-card:hover .related-card__title {
   color: #4b5563;
 }
-.notfound-screen {
+.notfound-screen:not([hidden]) {
   min-height: 100vh;
   display: flex;
   align-items: center;

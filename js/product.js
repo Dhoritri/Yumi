@@ -57,7 +57,7 @@ function renderTabs() {
     panel.appendChild(node);
   } else {
     const wrap = cloneTpl("tpl-pd-videos");
-    product.videos.forEach((vidId, idx) => {
+    (product.videos || []).forEach((vidId, idx) => {
       const v = cloneTpl("tpl-pd-video");
       const iframe = v.querySelector("iframe");
       iframe.src = "https://www.youtube-nocookie.com/embed/" + vidId;
@@ -130,6 +130,10 @@ async function initPage() {
     document.getElementById("pd-related").hidden = false;
     const grid = document.getElementById("pd-related-grid");
     relatedProducts.forEach((p) => grid.appendChild(renderProductCard(p)));
+  }
+
+  if (!product.videos || product.videos.length === 0) {
+    document.getElementById("pd-tab-videos").hidden = true;
   }
 
   renderGallery();

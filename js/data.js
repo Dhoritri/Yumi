@@ -21,7 +21,7 @@ const siteConfig = {
 const heroSlides = [
   {
     id: 1,
-    subtitle: "ESSENSTIAL ITEMS",
+    subtitle: "ESSENTIAL ITEMS",
     title: "Beauty Inspired by Real Life",
     description: "Made using clean, non-toxic ingredients, our products are designed for everyone.",
     buttonText: "Shop Now",
@@ -224,7 +224,7 @@ const aboutData = {
     },
     {
       id: 2,
-      title: "Our misstion",
+      title: "Our mission",
       description: "Luxe, lightweight, and made with the perfect blend of cashmere and cotton, our Sonoma Pillows and Throws are inspired by the basics we turn to season after season. Get to know the cozy essentials that will elevate your space in an instant.",
       image: "https://picsum.photos/1000/1000?random=303",
       imagePosition: "right",
@@ -251,7 +251,7 @@ const footerData = {
     ],
   },
   information: {
-    title: "Infomation",
+    title: "Information",
     links: [
       { label: "FAQ", href: "/faq" },
       { label: "Terms & Conditions", href: "/terms-conditions" },
@@ -533,7 +533,7 @@ const blogs = [
   {
     id: 4,
     slug: "50-shades-of-great",
-    category: "idk",
+    category: "Makeup",
     author: "Tashdid",
     day: "08",
     month: "Apr",
@@ -626,18 +626,6 @@ const blogs = [
     excerpt: "Breaking down the science behind organic vs synthetic ingredients in your daily skincare routine...",
     description: "Not all natural ingredients are created equal. We look at the certification process for organic farming and why these ingredients are often more potent and less irritating for sensitive skin. Join us as we visit our organic source farms.",
     image: "https://picsum.photos/1200/800?random=211",
-  },
-  {
-    id: 12,
-    slug: "minimalist-makeup-routine",
-    category: "Routine",
-    author: "Minimalist",
-    day: "10",
-    month: "Oct",
-    title: "A 5-minute minimalist makeup routine",
-    excerpt: "For the busy soul who wants to look put together without spending hours in front of the mirror every morning...",
-    description: "Less is more. We demonstrate how just four multi-purpose products can create a full, polished look. Perfect for travel, gym, or just a lazy Sunday morning. Focus on enhancing your natural features efficiently.",
-    image: "https://picsum.photos/1200/800?random=212",
   },
   {
     id: 12,
