@@ -140,6 +140,12 @@ html.js-anim [data-reveal].in-view {
   }
 }
 
+/* The wrapper must not box-constrain the sticky navbar — display:contents
+   lets the navbar stick relative to <body> across the whole page scroll. */
+#navbar-root {
+  display: contents;
+}
+
 .navbar {
   position: sticky;
   top: 0;
